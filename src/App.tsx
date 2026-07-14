@@ -117,15 +117,18 @@ export default function App() {
 
           <div className="flex items-center gap-3 flex-shrink-0">
             {/* CTA Button */}
-            <motion.button 
+            <motion.a
+              href="https://plataforma.reyacademy.com/login"
+              target="_blank"
+              rel="noopener noreferrer"
               whileHover={{ scale: 1.05, letterSpacing: "0.18em" }}
               whileTap={{ scale: 0.95 }}
-              className="bg-primary text-background px-4 sm:px-5 py-2.5 font-label-caps text-[10px] sm:text-[11px] rounded-full tracking-wide font-extrabold shadow-[0_0_20px_rgba(255,255,255,0.15)] cursor-pointer"
+              className="bg-primary text-background px-4 sm:px-5 py-2.5 font-label-caps text-[10px] sm:text-[11px] rounded-full tracking-wide font-extrabold shadow-[0_0_20px_rgba(255,255,255,0.15)] cursor-pointer inline-flex items-center justify-center"
               id="cta-acceder"
             >
               <span className="sm:hidden">ACCEDER</span>
               <span className="hidden sm:inline">ACCEDER A LA ACADEMIA</span>
-            </motion.button>
+            </motion.a>
 
             {/* Mobile Hamburger menu */}
             <button 
@@ -205,14 +208,17 @@ export default function App() {
             variants={revealUp}
             className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center w-full sm:w-auto px-4 sm:px-0"
           >
-            <motion.button 
+            <motion.a
+              href="https://plataforma.reyacademy.com/login"
+              target="_blank"
+              rel="noopener noreferrer"
               whileHover={{ scale: 1.05, letterSpacing: "0.22em", boxShadow: "0 0 30px rgba(255,255,255,0.25)" }}
               whileTap={{ scale: 0.95 }}
-              className="bg-primary text-background px-8 sm:px-12 py-5 sm:py-6 font-label-caps text-label-caps font-extrabold tracking-[0.2em] rounded-full w-full sm:w-auto shadow-[0_0_40px_rgba(255,255,255,0.1)] cursor-pointer"
+              className="bg-primary text-background px-8 sm:px-12 py-5 sm:py-6 font-label-caps text-label-caps font-extrabold tracking-[0.2em] rounded-full w-full sm:w-auto shadow-[0_0_40px_rgba(255,255,255,0.1)] cursor-pointer inline-flex items-center justify-center"
               id="hero-btn-empezar"
             >
               EMPEZAR AHORA
-            </motion.button>
+            </motion.a>
             <motion.button 
               whileHover={{ scale: 1.05, bg: "rgba(255,255,255,0.1)" }}
               whileTap={{ scale: 0.95 }}
@@ -478,8 +484,8 @@ export default function App() {
                     <motion.img 
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.6, ease: "easeOut" }}
-                      alt={success.name} 
-                      className="w-full h-full object-cover opacity-80 grayscale group-hover:grayscale-0 transition-all duration-500" 
+                      alt={success.name}
+                      className="w-full h-full object-cover opacity-80 transition-all duration-500"
                       src={success.image}
                     />
                     <div className="absolute bottom-4 left-4 bg-primary/90 text-background px-4 py-1.5 rounded-full font-label-caps text-[10px] font-black shadow-lg">
@@ -664,13 +670,16 @@ export default function App() {
                   </div>
 
                   <div className="flex items-end justify-between border-t border-white/10 pt-8">
-                    <motion.button 
+                    <motion.a
+                      href="https://maquina.reyacademy.com/maquina-del-exito-292448"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="bg-white text-black px-8 py-4 font-label-caps font-extrabold rounded-full tracking-widest cursor-pointer shadow-lg hover:shadow-white/5"
+                      className="bg-white text-black px-8 py-4 font-label-caps font-extrabold rounded-full tracking-widest cursor-pointer shadow-lg hover:shadow-white/5 inline-flex items-center justify-center"
                     >
                       POSTULAR AHORA
-                    </motion.button>
+                    </motion.a>
                   </div>
                 </div>
               </div>
@@ -713,13 +722,16 @@ export default function App() {
                   </div>
 
                   <div className="flex items-end justify-between border-t border-white/10 pt-8">
-                    <motion.button 
+                    <motion.a
+                      href="https://inscripcion.reyacademy.com/nitro_sales_2026-page"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="bg-white text-black px-8 py-4 font-label-caps font-extrabold rounded-full tracking-widest cursor-pointer shadow-lg hover:shadow-white/5"
+                      className="bg-white text-black px-8 py-4 font-label-caps font-extrabold rounded-full tracking-widest cursor-pointer shadow-lg hover:shadow-white/5 inline-flex items-center justify-center"
                     >
                       POSTULAR AHORA
-                    </motion.button>
+                    </motion.a>
                   </div>
                 </div>
               </div>
