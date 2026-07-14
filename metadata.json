@@ -1,0 +1,6 @@
+{
+  "name": "Rey Academy",
+  "description": "Plataforma de formación empresarial y consultoría estratégica para dueños de carnicerías.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
