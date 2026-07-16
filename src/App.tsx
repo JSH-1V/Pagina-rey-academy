@@ -194,15 +194,15 @@ export default function App() {
             variants={revealUp}
             className="font-display-xl text-[40px] sm:text-[56px] md:text-[68px] lg:text-display-xl text-primary mb-stack-lg leading-[1.05] sm:leading-[0.95] font-extrabold uppercase text-white break-words"
           >
-            Domina el Mercado <br />
-            <span className="text-white font-extrabold">Multiplica tu ROI</span>
+            Escala tu negocio <br />
+            <span className="text-white font-extrabold">Transforma tu mentalidad</span>
           </motion.h1>
 
-          <motion.p 
+          <motion.p
             variants={revealUp}
             className="font-body-lg text-[16px] sm:text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-10 sm:mb-12 font-medium"
           >
-            La formación académica definitiva para dueños de carnicerías que buscan libertad operativa y resultados financieros extraordinarios.
+            Formamos a dueños de negocios cárnicos que buscan rentabilidad, libertad operativa y resultados desde el primer día.
           </motion.p>
 
           <motion.div 
@@ -219,7 +219,7 @@ export default function App() {
               className="bg-primary text-background px-8 sm:px-12 py-5 sm:py-6 font-label-caps text-label-caps font-extrabold tracking-[0.2em] rounded-full w-full sm:w-auto shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.25)] transition-shadow duration-300 cursor-pointer inline-flex items-center justify-center"
               id="hero-btn-empezar"
             >
-              EMPEZAR AHORA
+              QUIERO SABER MÁS
             </motion.a>
             <motion.button 
               whileHover={{ scale: 1.05, bg: "rgba(255,255,255,0.1)" }}
@@ -259,12 +259,15 @@ export default function App() {
             variants={revealUp}
             className="text-center mb-20"
           >
-            <span className="font-label-caps text-primary tracking-[0.4em] mb-4 block font-bold">INSTITUCIONAL</span>
+            <span className="font-label-caps text-primary tracking-[0.4em] mb-4 block font-bold">TU NUEVA FORMA DE DIRIGIR UN NEGOCIO</span>
             <h2 className="font-headline-lg text-[30px] sm:text-[38px] md:text-headline-lg text-primary font-extrabold uppercase mb-8">
               ¿Qué es Rey Academy?
             </h2>
             <p className="font-body-lg text-on-surface-variant max-w-3xl mx-auto font-medium">
-              El epicentro de transformación empresarial para el sector cárnico en el mundo hispano.
+              Somos la única academia dedicada exclusivamente a dueños de carnicería de toda Latinoamérica.
+            </p>
+            <p className="font-headline-md text-[20px] text-primary font-extrabold mt-6 max-w-2xl mx-auto">
+              No es enseñar a cortar carne, es aprender a ser empresario
             </p>
           </motion.div>
 
@@ -293,6 +296,26 @@ export default function App() {
                 </p>
               </motion.div>
             ))}
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={revealUp}
+            className="flex justify-center mt-16"
+          >
+            <motion.a
+              href="https://inscripcion.reyacademy.com/nitro_sales_2026-page"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="bg-primary text-background px-10 py-5 font-label-caps text-label-caps font-extrabold tracking-[0.2em] rounded-full cursor-pointer inline-flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.25)] transition-shadow duration-300"
+            >
+              QUIERO NITRO AHORA
+            </motion.a>
           </motion.div>
         </div>
       </section>
@@ -788,10 +811,10 @@ export default function App() {
 
                 <div className="space-y-8">
                   <p className="font-body-lg text-on-surface-variant font-medium leading-relaxed">
-                    Nuestra historia no comenzó en una oficina, sino detrás de un mostrador. Rey Academy nació de la necesidad real de transformar el esfuerzo físico agotador en inteligencia estratégica. Durante décadas, vimos cómo dueños de carnicerías entregaban su vida al negocio sin ver la rentabilidad que merecían, atrapados en la operatividad diaria.
+                    Nuestra historia no comenzó en una oficina, sino detrás de un mostrador. Rey Academy nació de la necesidad real de transformar el esfuerzo físico agotador en inteligencia estratégica. Vivimos de cerca cómo dueños de carnicerías entregaban su vida al negocio sin ver la rentabilidad que merecían, atrapados en la operatividad diaria.
                   </p>
                   <p className="font-body-lg text-on-surface-variant font-medium leading-relaxed">
-                    Hoy, esa chispa inicial se ha convertido en el ecosistema de formación más influyente de la industria cárnica en habla hispana. No solo compartimos teoría; entregamos los sistemas, las métricas y la mentalidad necesaria para que el carnicero deje de ser un autoempleado y se convierta en el CEO de su propio imperio alimentario, logrando finalmente el equilibrio entre éxito financiero y calidad de vida familiar.
+                    Hoy, esa chispa inicial se ha convertido en el ecosistema de formación más influyente de la industria cárnica en habla hispana. No solo compartimos teoría; entregamos los sistemas, las métricas y la mentalidad necesaria para que el dueño de carnicería deje de ser un autoempleado y se convierta en el CEO de su propio negocio, logrando finalmente el equilibrio entre éxito financiero y calidad de vida familiar.
                   </p>
                   
                   <p className="font-body-md text-on-surface-variant/85 italic border-l border-white/20 pl-6 leading-relaxed">
