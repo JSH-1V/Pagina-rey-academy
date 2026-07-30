@@ -399,14 +399,14 @@ export default function App() {
             className="text-center mb-24"
           >
             <span className="font-label-caps text-primary tracking-[0.4em] mb-4 block font-bold">PROCESO ESTRATÉGICO</span>
-            <h2 class="font-headline-lg text-[30px] sm:text-[38px] md:text-headline-lg text-primary font-extrabold uppercase">
+            <h2 className="font-headline-lg text-[30px] sm:text-[38px] md:text-headline-lg text-primary font-extrabold uppercase">
               Ruta al Éxito
             </h2>
           </motion.div>
 
           <div className="relative">
-            {/* Connecting Horizontal Line in desktop */}
-            <div className="hidden lg:block absolute top-1/2 left-0 w-full h-[1px] bg-white/10 -translate-y-1/2 z-0" />
+            {/* Connecting Horizontal Line in desktop — aligned to the center of the w-16 h-16 step circles */}
+            <div className="hidden lg:block absolute top-8 left-0 w-full h-[1px] bg-white/10 z-0" />
             
             <motion.div 
               initial="hidden"
@@ -785,7 +785,7 @@ export default function App() {
                   transition={{ duration: 0.8 }}
                   alt="Founder of Rey Academy" 
                   className="w-full h-full object-cover grayscale transition-all duration-500 hover:grayscale-0" 
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVlIBYYxjn9sUnG7eGwEp6vhpgn8NM04P1_stNgic3sZN4rJrEEt99bQUJsSuqSnXNKL3WJkl1KFO0Dz2f0bmxjG0ohGOxyhw4o-2iyVdhLOlVj8o6ETGMi_v2dzEnVzR5q_KKDIbu_pe71aVN5yoA3VArLd3cHjCHQVlhT59TYdPIP_1L4lelWQwFSkJPiM_eTgFEAKpFQ4gOSpHrIDglVEpykw-BNv6gq6ow-XSSlTx3x1mTNLXTMp_tKeSsZ1gDBABImiGjHEs"
+                  src="https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6bb9314cb07d8c3f0a9b5a.png"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
               </div>
@@ -820,21 +820,6 @@ export default function App() {
                   <p className="font-body-md text-on-surface-variant/85 italic border-l border-white/20 pl-6 leading-relaxed">
                     "No enseñamos a cortar carne, enseñamos a construir imperios rentables que funcionen sin que el dueño tenga que estar presente."
                   </p>
-
-                  <div className="space-y-6 pt-4 border-t border-white/5">
-                    <div className="flex items-start sm:items-center gap-6">
-                      <span className="font-display-xl text-2xl text-primary font-black w-16 block flex-shrink-0">2010</span>
-                      <p className="text-sm sm:text-base text-on-surface-variant font-medium">Fundación del primer centro de capacitación técnico-familiar.</p>
-                    </div>
-                    <div className="flex items-start sm:items-center gap-6">
-                      <span className="font-display-xl text-2xl text-primary font-black w-16 block flex-shrink-0">2018</span>
-                      <p className="text-sm sm:text-base text-on-surface-variant font-medium">Lanzamiento de la plataforma digital para todo Latinoamérica.</p>
-                    </div>
-                    <div className="flex items-start sm:items-center gap-6">
-                      <span className="font-display-xl text-2xl text-primary font-black w-16 block flex-shrink-0">2023</span>
-                      <p className="text-sm sm:text-base text-on-surface-variant font-medium">Consolidación como la autoridad #1 en gestión cárnica empresarial.</p>
-                    </div>
-                  </div>
 
                   <div className="pt-12">
                     <motion.button 
@@ -1127,7 +1112,7 @@ export default function App() {
               </h4>
               <ul className="space-y-4 text-base text-on-surface-variant font-medium">
                 <li className="flex items-center gap-3"><span className="material-symbols-outlined text-primary text-base">mail</span> contacto@reyacademy.com</li>
-                <li className="flex items-center gap-3"><span class="material-symbols-outlined text-primary text-base">call</span> +1 (555) 902-1234</li>
+                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-primary text-base">call</span> +1 (555) 902-1234</li>
                 <li className="flex items-center gap-3"><span className="material-symbols-outlined text-primary text-base">location_on</span> Global Operations</li>
               </ul>
             </div>
