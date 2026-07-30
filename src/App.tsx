@@ -783,8 +783,8 @@ export default function App() {
                 <motion.img 
                   whileHover={{ scale: 1.03 }}
                   transition={{ duration: 0.8 }}
-                  alt="Founder of Rey Academy" 
-                  className="w-full h-full object-cover grayscale transition-all duration-500 hover:grayscale-0" 
+                  alt="Founder of Rey Academy"
+                  className="w-full h-full object-cover transition-all duration-500"
                   src="https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6bb9314cb07d8c3f0a9b5a.png"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
