@@ -76,7 +76,7 @@ export function LegalLayout({ title, updated, blocks }: LegalLayoutProps) {
           {title}
         </h1>
         <p className="font-label-caps text-[12px] text-on-surface-variant/70 tracking-wide font-bold mb-14 pb-8 border-b border-white/5">
-          Última actualización: {updated} · Versión 1.0
+          Última actualización: {updated}
         </p>
 
         <div>
