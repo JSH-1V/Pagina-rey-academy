@@ -12,16 +12,6 @@ export interface TimelineStep {
   delay: number;
 }
 
-export interface SuccessCase {
-  image: string;
-  badge: string;
-  name: string;
-  company: string;
-  quote: string;
-  stat: string;
-  delay: number;
-}
-
 export interface FaqItem {
   question: string;
   answer: string;
@@ -161,55 +151,20 @@ export const STATS = [
   { target: 15, suffix: "+", title: "PAÍSES IMPACTADOS", desc: "Dominio del mercado LATAM", delay: 0.4 },
 ];
 
-export const SUCCESS_CASES: SuccessCase[] = [
-  {
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuClP5BNeo6fVCFuIN0fkl51mgW8sLCJW0Wwj44Jojgcw3mloXPIVpuPdxxNJwK-VV81Z8w_ZStDMElqYsY4RgYnmjYAge0SlDD1Zrr3JWeNM40rjApU0YJJm6V71X6rKNUmU8XBaNagnzH-U9dr1883LbyrJ9DfAYZONaPUwkh6Kkjee3iTBHTAQwiuRG6h1AzypWWfhb6x7MGHjXQ78YSxzqiAgzIs2TKLznguFadEg805uwla26PFKZPGT5HLq___nb0b-fq2neE",
-    badge: "+240% RENTABILIDAD",
-    name: "Roberto Méndez",
-    company: "Carnes del Norte, México",
-    quote: '"Logramos sistematizar las 3 sucursales y ahora opero solo 4 horas a la semana."',
-    stat: "REDUCCIÓN MERMA: 18%",
-    delay: 0,
-  },
-  {
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBokKZnccirXIvfdpd-LBYRpfixJHDq9dQnXxVGfw3MnbFpm2btcLLh4JHjc7EygpSLwuvtNgl2-_Y2Ux-gExcRSHQWxzB2oFlLI5Lr075MgOZhK1_aEHWqwDfXXZHgfRmaupZUyrAhvlRtAEYroctMwNcue-eIrbrMnCD3ZS2qupXpECwfQK9vWanqjmvS7h_KUNHm1zTLpu9GzyZ0JB9jdOyQj4h1dSMOve9_UzPUbR0sK4eRN7G4FYhlRuvMVKAu_HDk3ugcQtA",
-    badge: "REDUCCIÓN 0% DEUDA",
-    name: "Juan Carlos Paez",
-    company: "FrigoPremium, Colombia",
-    quote: '"El control de inventario de Rey Academy salvó mi flujo de caja en solo 3 meses."',
-    stat: "COSTO REDUCIDO: 12%",
-    delay: 0.1,
-  },
-  {
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBPIT9b3JqVcVhiAIIZhLiObZPTnCI0jIJCTB3hhTuQTiQZ7aVN4KR5vJHmVp7XYyqzeea1qeDyhriGT4AMEbg-22UTMw20m346C-FD37BcpVlAL0UUb928HmUA8rOF5KJc0qvb8OVpYTq8OYtfKggfNMbB-r_A_3Ib07FtcDTXuXfgEtaOgTfXMc2UwHwISm299fTQEP4ppPiJFzxMaW8WO-SVC8RjcuXCJ8nAfiu8COX6nZXaaORs07i9zOAdeeZlJj_nmOFNR5w",
-    badge: "15 SUCURSALES",
-    name: "Elena Vargas",
-    company: "Global Meat, Argentina",
-    quote: '"La mentalidad de imperio que enseñan es lo que realmente marca la diferencia."',
-    stat: "ESCALADO: 300%",
-    delay: 0.2,
-  },
-];
-
-export const TESTIMONIALS = [
-  {
-    text: '"No es solo un curso, es un antes y un después en cómo entiendo mi negocio. La planilla de costos maestra es oro puro."',
-    author: "Carlos Rivera",
-    role: "FUNDADOR, RIVERA MEATS",
-    avatar: "",
-  },
-  {
-    text: '"La sistematización de procesos nos permitió abrir dos nuevas sucursales sin duplicar mi carga de trabajo. Excelente inversión."',
-    author: "Andrés Gomez",
-    role: "DIRECCIÓN, CARNES SUPREMAS",
-    avatar: "",
-  },
-  {
-    text: '"Redujimos las mermas a la mitad en menos de 60 días. El retorno de inversión es inmediato e incuestionable."',
-    author: "Sandra Peralta",
-    role: "GERENTE GENERAL, DISTRIBUIDORA MEAT",
-    avatar: "",
-  },
+export const TESTIMONIAL_VIDEOS: string[] = [
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf39aee7c9fa58ab1a2cd.mp4",
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf39aee7c9fa58ab1a2de.mp4",
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf39a3e7f0eb554c0f758.mp4",
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf39a2dd240068d2fbe93.mp4",
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf439497cd89d244451bc.mp4",
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf39a5c1fd3e905932062.mp4",
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf46832db2dd157e79ea4.mp4",
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf39aee7c9fa58ab1a2bc.mp4",
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf472497cd89d24448164.mp4",
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf4653e7f0eb554c28b14.mp4",
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf4bb188345b27eef4d08.mp4",
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf4c35c1fd3e90594a25d.mp4",
+  "https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a6cf52dcf81b06f052aeb21.mp4",
 ];
 
 export const FREE_RESOURCES: ResourceItem[] = [

@@ -13,17 +13,16 @@ import {
   SERVICES,
   TIMELINE_STEPS,
   STATS,
-  SUCCESS_CASES,
-  TESTIMONIALS,
+  TESTIMONIAL_VIDEOS,
   FREE_RESOURCES
 } from "../data";
 import { AnimatedCounter } from "../components/AnimatedCounter";
 import { FaqAccordion } from "../components/FaqAccordion";
 import { ParallaxCard } from "../components/ParallaxCard";
+import { VideoTestimonialCarousel } from "../components/VideoTestimonialCarousel";
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
 
   // Monitor scroll for header background opacity
@@ -38,15 +37,6 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Handle testimonial sliding
-  const nextTestimonial = () => {
-    setActiveTestimonial((prev) => (prev + 1) % TESTIMONIALS.length);
-  };
-
-  const prevTestimonial = () => {
-    setActiveTestimonial((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
-  };
 
   // Reveal animation presets
   const revealUp = {
@@ -475,163 +465,33 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Success Cases Section */}
-      <section className="py-section-padding bg-background">
+      {/* Testimonials Video Carousel Section */}
+      <section className="py-section-padding bg-surface-container-lowest overflow-hidden">
         <div className="max-w-container-max mx-auto px-margin-mobile md:px-gutter">
-          <motion.div 
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={revealUp}
-            className="text-center mb-20"
+            className="text-center mb-16"
           >
-            <span className="font-label-caps text-primary tracking-[0.4em] mb-4 block font-bold">CASOS DE ÉXITO</span>
-            <h2 className="font-headline-lg text-[30px] sm:text-[38px] md:text-headline-lg text-primary font-extrabold uppercase">
-              Historias de Transformación
+            <span className="font-label-caps text-primary tracking-[0.4em] mb-4 block font-bold">VOZ DEL CLIENTE</span>
+            <h2 className="font-headline-lg text-[30px] sm:text-[38px] md:text-headline-lg text-primary font-extrabold uppercase mb-8">
+              Testimonios de Impacto
             </h2>
+            <p className="font-body-lg text-on-surface-variant max-w-2xl mx-auto font-medium">
+              Empresarios que confiaron en nuestro método y hoy son referentes en sus mercados locales.
+            </p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
-            variants={staggerContainer}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            variants={revealUp}
           >
-            {SUCCESS_CASES.map((success, i) => (
-              <motion.div
-                key={i}
-                variants={revealUp}
-                whileHover={{ y: -8, borderColor: "rgba(255,255,255,0.2)" }}
-                className="bg-surface-container-low rounded-3xl overflow-hidden border border-white/5 transition-all duration-300 group flex flex-col justify-between"
-              >
-                <div>
-                  <div className="h-64 bg-surface-container-highest relative overflow-hidden">
-                    <motion.img 
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                      alt={success.name}
-                      className="w-full h-full object-cover opacity-80 transition-all duration-500"
-                      src={success.image}
-                    />
-                    <div className="absolute bottom-4 left-4 bg-primary/90 text-background px-4 py-1.5 rounded-full font-label-caps text-[10px] font-black shadow-lg">
-                      {success.badge}
-                    </div>
-                  </div>
-                  <div className="p-8">
-                    <h4 className="font-headline-md text-[22px] text-primary font-bold mb-1">
-                      {success.name}
-                    </h4>
-                    <p className="text-sm text-on-surface-variant/60 mb-6 font-bold tracking-widest uppercase">
-                      {success.company}
-                    </p>
-                    <p className="font-body-md text-base text-on-surface-variant mb-6 italic leading-relaxed">
-                      {success.quote}
-                    </p>
-                  </div>
-                </div>
-                <div className="px-8 pb-8">
-                  <div className="flex justify-between items-center border-t border-white/5 pt-6">
-                    <span className="font-label-caps text-[10px] text-primary font-bold tracking-wider">
-                      {success.stat}
-                    </span>
-                    <span className="material-symbols-outlined text-primary text-xl" title="Auditado y Verificado">
-                      verified
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+            <VideoTestimonialCarousel videos={TESTIMONIAL_VIDEOS} />
           </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonials Slider Section */}
-      <section className="py-section-padding bg-surface-container-lowest">
-        <div className="max-w-container-max mx-auto px-margin-mobile md:px-gutter">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            
-            <motion.div 
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={revealUp}
-              className="flex flex-col h-full justify-between"
-            >
-              <div>
-                <span className="font-label-caps text-primary tracking-[0.4em] mb-4 block font-bold">VOZ DEL CLIENTE</span>
-                <h2 className="font-headline-lg text-[30px] sm:text-[38px] md:text-headline-lg text-primary font-extrabold uppercase mb-8">
-                  Testimonios de Impacto
-                </h2>
-                <p className="font-body-lg text-on-surface-variant mb-12 max-w-md font-medium">
-                  Empresarios que confiaron en nuestro método y hoy son referentes en sus mercados locales.
-                </p>
-              </div>
-              
-              {/* Slider controls */}
-              <div className="flex gap-4">
-                <motion.button 
-                  whileHover={{ scale: 1.1, bg: "rgba(255,255,255,0.08)" }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={prevTestimonial}
-                  className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center cursor-pointer text-primary transition-colors hover:border-white/20 select-none"
-                  aria-label="Previous testimonial"
-                >
-                  <span className="material-symbols-outlined">arrow_back</span>
-                </motion.button>
-                <motion.button 
-                  whileHover={{ scale: 1.1, bg: "rgba(255,255,255,0.08)" }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={nextTestimonial}
-                  className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center cursor-pointer text-primary transition-colors hover:border-white/20 select-none"
-                  aria-label="Next testimonial"
-                >
-                  <span className="material-symbols-outlined">arrow_forward</span>
-                </motion.button>
-              </div>
-            </motion.div>
-
-            {/* Slide container */}
-            <div className="relative h-72 sm:h-64 flex items-center">
-              <AnimatePresence mode="wait">
-                <motion.div 
-                  key={activeTestimonial}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.4, ease: [0.2, 1, 0.3, 1] }}
-                  className="w-full p-10 bg-background rounded-[32px] border border-white/5 flex flex-col justify-between h-full"
-                >
-                  <div>
-                    <div className="flex gap-1 mb-6">
-                      {[...Array(5)].map((_, starIdx) => (
-                        <span key={starIdx} className="material-symbols-outlined text-status-success text-[18px]">
-                          star
-                        </span>
-                      ))}
-                    </div>
-                    <p className="font-body-lg text-on-surface text-base sm:text-lg mb-8 italic leading-relaxed">
-                      {TESTIMONIALS[activeTestimonial].text}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden flex items-center justify-center border border-white/10 select-none">
-                      <span className="material-symbols-outlined text-primary/55">person</span>
-                    </div>
-                    <div>
-                      <h5 className="font-bold text-primary text-sm sm:text-base">
-                        {TESTIMONIALS[activeTestimonial].author}
-                      </h5>
-                      <p className="text-[11px] sm:text-xs text-on-surface-variant font-bold tracking-widest uppercase">
-                        {TESTIMONIALS[activeTestimonial].role}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-          </div>
         </div>
       </section>
 
@@ -920,7 +780,7 @@ export default function Home() {
               <ul className="space-y-6">
                 <motion.li whileHover={{ x: 6 }} className="flex items-center gap-4 cursor-default">
                   <span className="material-symbols-outlined text-primary text-2xl">hub</span>
-                  <span className="font-body-md font-bold text-lg">Canal de Discord Exclusivo</span>
+                  <span className="font-body-md font-bold text-lg">Comunidad de WhatsApp Exclusiva</span>
                 </motion.li>
                 <motion.li whileHover={{ x: 6 }} className="flex items-center gap-4 cursor-default">
                   <span className="material-symbols-outlined text-primary text-2xl">video_stable</span>
