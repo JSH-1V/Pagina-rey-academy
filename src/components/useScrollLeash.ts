@@ -45,13 +45,27 @@ export function useScrollLeash(sectionRef: RefObject<HTMLElement>, options: Scro
     let lastT = performance.now();
     let raf = 0;
 
+    // Margen de tolerancia en los bordes: `window.scrollTo` puede redondear
+    // la posición que le pedimos (subpíxel, DPI, zoom del navegador). Sin
+    // este margen, justo en el borde inferior quedaba una trampa: tick()
+    // clava el scroll en `bounds.bottom` (con decimales) y pone velocity en
+    // 0, pero el navegador guarda un `scrollY` redondeado un pelo por debajo
+    // — el siguiente wheel event lee ese `scrollY` ligeramente menor, la
+    // comparación `y >= bounds.bottom` da falso, así que el hook sigue
+    // pensando que estás "adentro" y vuelve a interceptar el scroll. Eso se
+    // repite en cada tick, atrapando el scroll ahí para siempre (se sentía
+    // como "extremadamente pesado" o directamente trabado). Con un colchón
+    // de unos pocos píxeles en la comparación, un desfasaje de redondeo ya
+    // no puede volver a cerrar la trampa.
+    const EDGE_EPS = 3;
+
     const getBounds = () => {
       const el = sectionRef.current;
       if (!el) return null;
       const rect = el.getBoundingClientRect();
-      const top = rect.top + window.scrollY;
+      const top = Math.round(rect.top + window.scrollY);
       const scrollable = el.offsetHeight - window.innerHeight;
-      return scrollable > 1 ? { top, bottom: top + scrollable } : null;
+      return scrollable > 1 ? { top, bottom: top + Math.round(scrollable) } : null;
     };
 
     const onWheel = (e: WheelEvent) => {
@@ -68,7 +82,7 @@ export function useScrollLeash(sectionRef: RefObject<HTMLElement>, options: Scro
       const y = window.scrollY;
       // Todavía no llegó a la sección, o ya la dejó atrás del todo — scroll
       // nativo normal, no intervenir.
-      if (y <= bounds.top || y >= bounds.bottom) return;
+      if (y <= bounds.top + EDGE_EPS || y >= bounds.bottom - EDGE_EPS) return;
 
       e.preventDefault();
       velocity = Math.min(MAX_VELOCITY, velocity + e.deltaY * IMPULSE);
@@ -92,7 +106,7 @@ export function useScrollLeash(sectionRef: RefObject<HTMLElement>, options: Scro
       }
 
       const y = window.scrollY;
-      if (y <= bounds.top || y >= bounds.bottom) return;
+      if (y <= bounds.top + EDGE_EPS || y >= bounds.bottom - EDGE_EPS) return;
 
       e.preventDefault();
       velocity = Math.min(MAX_VELOCITY, velocity + deltaY * IMPULSE);
@@ -113,7 +127,7 @@ export function useScrollLeash(sectionRef: RefObject<HTMLElement>, options: Scro
             next = bounds.bottom;
             velocity = 0;
           }
-          window.scrollTo(0, next);
+          window.scrollTo(0, Math.round(next));
         }
         // Decaimiento independiente del framerate real (no solo "por frame").
         velocity *= Math.pow(FRICTION_PER_FRAME, dt * 60);
