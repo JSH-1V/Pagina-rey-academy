@@ -4,28 +4,18 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useMotionValueEvent,
-  useReducedMotion,
-  type MotionValue
-} from "motion/react";
+import { motion, useTransform, useMotionValueEvent, useReducedMotion, type MotionValue } from "motion/react";
 import { DitherField } from "./fx/DitherField";
 import ShinyText from "./fx/ShinyText";
-import { useScrollLeash } from "./useScrollLeash";
-import { useReleaseFracProgress } from "./useReleaseFracProgress";
+import { useAutoPlayOnEnter } from "./useAutoPlayOnEnter";
 
 const DITHER_COLORS: [string, string, string, string] = ["#0d0d0d", "#3a0d0d", "#f42525", "#ffffff"];
 
 /**
- * Una palabra del titular, ligada DIRECTO a la posición de scroll (no a un
- * timer). Es a propósito: el fondo (la corona ditherizada) también avanza
- * con el scroll, y si el texto terminaba de aparecer a los pocos centímetros
- * mientras quedaban 2 pantallas de fondo por recorrer, se sentía como scroll
- * perdido mirando lo mismo. Atado 1:1 a la misma barra de progreso, el texto
- * acompaña al fondo de principio a fin — nunca se "adelanta" ni se "atrasa".
+ * Una palabra del titular, ligada al progreso automático (no al scroll del
+ * usuario — ver `useAutoPlayOnEnter`). El fondo (la corona ditherizada)
+ * avanza con el mismo progreso, así que texto y fondo siempre terminan de
+ * armarse juntos, sin importar nada de lo que haga el usuario mientras tanto.
  */
 function ScrubWord({
   word,
@@ -143,14 +133,16 @@ interface StatementScrubProps {
   framePath?: string;
   frameExt?: string;
   frameCount?: number;
-  heightClassName?: string;
 }
 
 /**
- * Sección de declaración de marca sobre la corona ditherizada, que avanza
- * frame a frame con el scroll (no se reproduce sola). El bloque mide varias
- * pantallas de alto y el contenido queda pegado mientras la secuencia corre
- * despacio por detrás.
+ * Sección de declaración de marca sobre la corona ditherizada. Igual que
+ * Metodología (ver useAutoPlayOnEnter.ts): ya no depende de qué tan fuerte
+ * scrollee el usuario — calibrar esa velocidad a control remoto resultó
+ * imposible (siempre quedaba "muy rápido" o "muy lento" sin punto medio
+ * estable). Al entrar en pantalla, el titular + el frame-scrub de fondo se
+ * reproducen solos a un ritmo fijo, con el scroll bloqueado mientras dura, y
+ * se liberan solos al terminar.
  *
  * Los frames se precargan solo cuando la sección se acerca al viewport: son
  * ~3 MB y no tienen por qué pesar en la carga inicial de la página.
@@ -161,40 +153,18 @@ export function StatementScrub({
   accent,
   framePath = "/scrub/frame_",
   frameExt = "webp",
-  frameCount = 62,
-  // Mobile achicado a la mitad del recorrido real (200vh - 100svh de sticky
-  // = 100vh de scroll antes; 150vh - 100svh = 50vh ahora): en pantallas
-  // chicas hacía falta demasiado scroll para terminar de revelar el texto y
-  // el frame-scrub de fondo. sm:/lg: quedan igual — el pedido era solo mobile.
-  heightClassName = "h-[150vh] sm:h-[240vh] lg:h-[300vh]"
+  frameCount = 62
 }: StatementScrubProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const progressRef = useRef(0);
   const reduce = useReducedMotion();
   const [active, setActive] = useState(false);
 
-  // Mismo "carril" con física de Metodología, pero con tope más bajo (acá el
-  // recorrido es más corto, así que con el tope original alcanzaba con
-  // spamear la rueda un segundo para cruzar toda la sección). El primer
-  // ajuste bajó demasiado el impulso y aceleró la fricción a la vez — al
-  // retomar el scroll después de subir (la velocidad se resetea a 0 al
-  // subir, a propósito, para no pelear contra el usuario), casi no quedaba
-  // "empuje" con el que reconstruir velocidad, y se sentía trabado en vez de
-  // solo lento. Acá el tope sigue bajo, pero el impulso y la fricción vuelven
-  // a valores cercanos a los de Metodología para que retomar el scroll no
-  // cueste. En la rama de `reduce` el ref nunca se attachea a un elemento,
-  // así que el hook queda inerte solo (getBounds da null).
-  useScrollLeash(sectionRef, { maxVelocity: 480, frictionPerFrame: 0.91, impulse: 1.8 });
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"]
-  });
-
-  // Reescala 0→releaseFrac a 0→1 para que tanto el texto como el frame del
-  // fondo terminen de armarse ANTES de que el pin (`sticky`) se suelte, nunca
-  // durante — ver el comentario en useReleaseFracProgress.ts para el porqué.
-  const activeProgress = useReleaseFracProgress(sectionRef, scrollYProgress);
+  // 4500ms lineales se sentían eternos y, sobre todo, no se podía hacer nada
+  // para apurarlos. Ahora el piso son 3000ms y scrollear hacia abajo acelera
+  // hasta ~3x, así que el punto medio entre "fluido" y "rápido" lo termina de
+  // elegir el usuario en el momento — no hay un número que acertar.
+  const activeProgress = useAutoPlayOnEnter(sectionRef, { duration: 3000 });
 
   useMotionValueEvent(activeProgress, "change", (v) => {
     progressRef.current = v;
@@ -262,83 +232,86 @@ export function StatementScrub({
   }
 
   return (
-    <section ref={sectionRef} className={`relative bg-background ${heightClassName}`} id="conviccion">
-      <div className="sticky top-0 h-[100svh] w-full overflow-hidden flex items-center justify-center">
-        <div className="absolute inset-0 z-0">
-          {active && (
-            <DitherField
-              framePath={framePath}
-              frameExt={frameExt}
-              frameCount={frameCount}
-              progressRef={progressRef}
-              // Inercia alta: la imagen persigue al scroll en vez de saltar con
-              // él. Es lo que hace que se lea como cámara lenta.
-              smoothing={0.3}
-              colors={DITHER_COLORS}
-              pixelSize={4}
-              ditherStrength={1}
-              contrast={1.25}
-              brightness={1.05}
-            />
-          )}
-        </div>
-
-        {/* Oscurecido general: el dither es de alto contraste y el titular
-            tiene que ganarle sin subir el texto a un blanco quemado. */}
-        <div aria-hidden="true" className="absolute inset-0 z-[1] bg-background/55" />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 z-[1] pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(100% 100% at 50% 50%, transparent 32%, rgba(19,19,19,0.9) 100%)"
-          }}
-        />
-        {/* Fundidos arriba y abajo: la sección vive entre otras dos oscuras y
-            no debe leerse como un recuadro pegado. */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-40 z-[1] pointer-events-none bg-gradient-to-b from-background to-transparent"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-40 z-[1] pointer-events-none bg-gradient-to-t from-background to-transparent"
-        />
-
-        <motion.div
-          style={{ opacity: contentOpacity }}
-          className="relative z-10 w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter text-center"
-        >
-          {/* Mismo drop-shadow que el eyebrow del hero: sin esto, contra un
-              frame claro del dither el gris se lava igual que le pasaba al
-              texto del hero antes de aplicárselo ahí. */}
-          <span
-            className="font-label-caps tracking-[0.4em] font-bold block mb-8 sm:mb-12"
-            style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.95)) drop-shadow(0 4px 12px rgba(0,0,0,0.8))" }}
-          >
-            <ShinyText text={eyebrow} speed={5} color="#8e9192" shineColor="#ffffff" spread={80} />
-          </span>
-
-          {/* Ligado a `activeProgress` (no al `scrollYProgress` crudo del
-              wrapper completo): así el armado del titular termina ANTES de
-              que el bloque `sticky` se desenganche y empiece a deslizarse
-              fuera de la pantalla — ver el comentario junto a `activeProgress`
-              más arriba. Antes, con `scrollYProgress` directo, el tramo final
-              del reveal (después de ~0.6–0.7) ocurría con el bloque ya
-              saliendo del viewport: se leía como que el texto "desaparecía". */}
-          <h2 className={headingClasses}>
-            <ScrubLine text={lead} progress={activeProgress} from={0.04} to={0.46} color="#ffffff" />
-            <ScrubLine
-              text={accent}
-              progress={activeProgress}
-              from={0.42}
-              to={0.9}
-              color="rgb(244, 37, 37)"
-              className="mt-3 sm:mt-5"
-            />
-          </h2>
-        </motion.div>
+    <section
+      ref={sectionRef}
+      className="relative bg-background h-[100svh] w-full overflow-hidden flex items-center justify-center"
+      id="conviccion"
+    >
+      <div className="absolute inset-0 z-0">
+        {active && (
+          <DitherField
+            framePath={framePath}
+            frameExt={frameExt}
+            frameCount={frameCount}
+            progressRef={progressRef}
+            // Bajado de 0.3s a 0.1s: con 0.3 la corona iba casi un tercio de
+            // segundo por detrás del titular, y al terminar el texto todavía
+            // seguía acomodándose ~1s más. Se leía como lag, no como cámara
+            // lenta, y era parte del "tiempo muerto" del final. Con 0.1 sigue
+            // suavizando el salto entre frames pero acompaña al texto.
+            smoothing={0.1}
+            colors={DITHER_COLORS}
+            pixelSize={4}
+            ditherStrength={1}
+            contrast={1.25}
+            brightness={1.05}
+          />
+        )}
       </div>
+
+      {/* Oscurecido general: el dither es de alto contraste y el titular
+          tiene que ganarle sin subir el texto a un blanco quemado. */}
+      <div aria-hidden="true" className="absolute inset-0 z-[1] bg-background/55" />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(100% 100% at 50% 50%, transparent 32%, rgba(19,19,19,0.9) 100%)"
+        }}
+      />
+      {/* Fundidos arriba y abajo: la sección vive entre otras dos oscuras y
+          no debe leerse como un recuadro pegado. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-40 z-[1] pointer-events-none bg-gradient-to-b from-background to-transparent"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 bottom-0 h-40 z-[1] pointer-events-none bg-gradient-to-t from-background to-transparent"
+      />
+
+      <motion.div
+        style={{ opacity: contentOpacity }}
+        className="relative z-10 w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter text-center"
+      >
+        {/* Mismo drop-shadow que el eyebrow del hero: sin esto, contra un
+            frame claro del dither el gris se lava igual que le pasaba al
+            texto del hero antes de aplicárselo ahí. */}
+        <span
+          className="font-label-caps tracking-[0.4em] font-bold block mb-8 sm:mb-12"
+          style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.95)) drop-shadow(0 4px 12px rgba(0,0,0,0.8))" }}
+        >
+          <ShinyText text={eyebrow} speed={5} color="#8e9192" shineColor="#ffffff" spread={80} />
+        </span>
+
+        <h2 className={headingClasses}>
+          {/* Los dos tramos ahora cubren casi todo el 0→1. Antes el segundo
+              cerraba en 0.9: el titular quedaba terminado y todavía faltaba
+              un 10% de reproducción con la página bloqueada sin que pasara
+              nada visible. El 0.05 que sobra al final es a propósito — un
+              respiro corto para leer la frase completa antes de soltar. */}
+          <ScrubLine text={lead} progress={activeProgress} from={0.02} to={0.44} color="#ffffff" />
+          <ScrubLine
+            text={accent}
+            progress={activeProgress}
+            from={0.4}
+            to={0.95}
+            color="rgb(244, 37, 37)"
+            className="mt-3 sm:mt-5"
+          />
+        </h2>
+      </motion.div>
     </section>
   );
 }

@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useTransform, type Variants } from "motion/react";
+import { motion, AnimatePresence, useTransform, type Variants } from "motion/react";
 import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -45,8 +45,7 @@ import Topography from "../components/fx/Topography";
 import LightRays from "../components/fx/LightRays";
 import Plasma from "../components/fx/Plasma";
 import { MethodologyPath } from "../components/MethodologyPath";
-import { useScrollStepper } from "../components/useScrollStepper";
-import { useReleaseFracProgress } from "../components/useReleaseFracProgress";
+import { useAutoPlayOnEnter } from "../components/useAutoPlayOnEnter";
 import SplitText from "../components/fx/SplitText";
 import AnimatedContent from "../components/fx/AnimatedContent";
 
@@ -55,7 +54,7 @@ import AnimatedContent from "../components/fx/AnimatedContent";
 gsap.registerPlugin(ScrollTrigger);
 
 // Los 3 programas insignia — se usan en el marquee justo debajo del hero.
-const PROGRAM_NAMES = ["Máquina del Éxito", "Nitro Branding", "Maestría de la Carne"];
+const PROGRAM_NAMES = ["Máquina del Éxito", "Nitro", "Maestría de la Carne"];
 
 const METHOD_ITEMS = [
   { title: "Aprender Haciendo", desc: "No somos teóricos. Cada lección se basa en la práctica real del mostrador." },
@@ -138,30 +137,20 @@ export default function HomeV2({ heroVariant = "fusion" }: { heroVariant?: HeroV
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeBooking, setActiveBooking] = useState<ProgramBooking | null>(null);
   const ctaContainerRef = useRef<HTMLDivElement>(null);
-  // Metodología (solo dither): la sección se pinea mientras la línea roja
-  // recorre las 6 tarjetas, y recién se suelta cuando termina.
+  // Metodología (solo dither): la reproducción tiene un piso de velocidad
+  // garantizado (termina sola en `duration` aunque el usuario no toque nada,
+  // así nunca se traba como pasaba con los modelos atados al scroll) pero
+  // scrollear hacia abajo la acelera hasta ~3x en vez de ser ignorado. Ver
+  // useAutoPlayOnEnter.ts para el porqué de cada pieza.
   const methodSectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress: methodProgress } = useScroll({
-    target: methodSectionRef,
-    offset: ["start start", "end end"]
-  });
-  // El modelo de física continua (velocidad + fricción, como en
-  // StatementScrub) resultó imposible de calibrar a control remoto acá: 450
-  // no se notaba, 220 se sintió muy lento, 330 volvió a sentirse rápido —
-  // rebotando sin punto medio estable. Con pasos fijos, un primer intento de
-  // 8 pasos grandes (~190px c/u) se sintió como saltos, no como scroll — acá
-  // con pasos chicos (55px) y rápidos (190ms) para que se lean como
-  // desplazamiento fluido en vez de saltos entre tarjetas.
-  useScrollStepper(methodSectionRef, { stepPx: 55, stepDuration: 190 });
-  // Igual que StatementScrub: `methodProgress` crudo llega a 1 recién cuando
-  // el wrapper entero termina de pasar, pero el `sticky` se desengancha
-  // bastante antes (en mobile, a los 280vh de antes, ~64% del recorrido) —
-  // sin reescalar, las últimas tarjetas podían seguir revelándose con la
-  // sección ya deslizándose fuera de pantalla. `activeMethodProgress`
-  // garantiza que la línea + las 6 tarjetas siempre terminan de revelarse
-  // ANTES de que el pin se suelte, sea cual sea la altura de la sección.
-  const activeMethodProgress = useReleaseFracProgress(methodSectionRef, methodProgress);
+  const activeMethodProgress = useAutoPlayOnEnter(methodSectionRef, { duration: 2600 });
   const methodHeaderOpacity = useTransform(activeMethodProgress, [0, 0.05], [0, 1]);
+  // La línea/tarjetas terminan su recorrido en el 92% de la reproducción, no
+  // en el 100%: la última tarjeta encendía justo en el último frame y el
+  // scroll se liberaba en el mismo instante, sin un solo momento para ver la
+  // grilla completa. Ese 8% (~200ms) es el respiro, y es corto a propósito
+  // para que siga leyéndose como un final y no como una espera.
+  const methodPathProgress = useTransform(activeMethodProgress, [0, 0.92], [0, 1], { clamp: true });
 
   // Monitor scroll for header background opacity
   useEffect(() => {
@@ -507,7 +496,7 @@ export default function HomeV2({ heroVariant = "fusion" }: { heroVariant?: HeroV
           scaleOnHover
           fadeOut
           fadeOutColor="#0e0e0e"
-          ariaLabel="Nuestros programas: Máquina del Éxito, Nitro Branding, Maestría de la Carne"
+          ariaLabel="Nuestros programas: Máquina del Éxito, Nitro, Maestría de la Carne"
         />
       </section>
 
@@ -1198,10 +1187,10 @@ export default function HomeV2({ heroVariant = "fusion" }: { heroVariant?: HeroV
                 </div>
 
                 <div className="space-y-8">
-                  <p className="font-body-lg text-on-surface-variant font-medium leading-relaxed">
+                  <p className="font-body-lg text-on-surface-variant font-medium leading-relaxed text-justify">
                     Nuestra historia no comenzó en una oficina, sino detrás de un mostrador. Rey Academy nació de la necesidad real de transformar el esfuerzo físico agotador en inteligencia estratégica. Vivimos de cerca cómo dueños de carnicerías entregaban su vida al negocio sin ver la rentabilidad que merecían, atrapados en la operatividad diaria.
                   </p>
-                  <p className="font-body-lg text-on-surface-variant font-medium leading-relaxed">
+                  <p className="font-body-lg text-on-surface-variant font-medium leading-relaxed text-justify">
                     Hoy, esa chispa inicial se ha convertido en el ecosistema de formación más influyente de la industria cárnica en habla hispana. No solo compartimos teoría; entregamos los sistemas, las métricas y la mentalidad necesaria para que el dueño de carnicería deje de ser un autoempleado y se convierta en el CEO de su propio negocio, logrando finalmente el equilibrio entre éxito financiero y calidad de vida familiar.
                   </p>
                   
@@ -1223,25 +1212,6 @@ export default function HomeV2({ heroVariant = "fusion" }: { heroVariant?: HeroV
                     </GradientText>
                   </motion.blockquote>
 
-                  <div className="pt-12">
-                    <motion.a
-                      href="#programas"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="group flex items-center gap-4 bg-primary text-background px-10 py-5 font-label-caps text-[14px] font-extrabold tracking-[0.2em] rounded-full shadow-[0_10px_30px_rgba(255,255,255,0.1)] cursor-pointer"
-                    >
-                      CONOCER MÁS
-                      <motion.span
-                        variants={{
-                          hover: { x: 5 }
-                        }}
-                        className="material-symbols-outlined"
-                      >
-                        arrow_forward
-                      </motion.span>
-                    </motion.a>
-                  </div>
-
                 </div>
               </div>
             </ScrollReveal>
@@ -1251,50 +1221,49 @@ export default function HomeV2({ heroVariant = "fusion" }: { heroVariant?: HeroV
       </section>
 
       {/* Methodology Section — fondo "Color Bends" monocromático detrás de la
-          grilla. En /v2/dither la sección se PINEA (scroll-jack, como el hero
-          parallax o la declaración de marca): la pantalla queda fija mientras
-          la línea roja recorre las 6 tarjetas, y recién se suelta al terminar. */}
-      {/* Mobile achicado a la mitad del recorrido real (280vh - 100svh de
-          sticky = 180vh de scroll antes; 190vh - 100svh = 90vh ahora) — hacía
-          falta demasiado scroll para revelar las 6 tarjetas en pantallas
-          chicas. sm:/lg: sin cambios. */}
+          grilla. En /v2/dither la sección se reproduce sola al entrar en
+          pantalla (ver useAutoPlayOnEnter.ts): ya no depende del scroll del
+          usuario para nada, así que no hace falta el wrapper alto + sticky
+          de antes — una sola pantalla alcanza, el scroll queda bloqueado
+          mientras dura la animación automática y se libera solo al terminar. */}
       {isDither ? (
-        <section ref={methodSectionRef} className="relative bg-surface-container-lowest h-[190vh] sm:h-[300vh] lg:h-[320vh]">
-          <div className="sticky top-0 h-[100svh] w-full overflow-hidden flex flex-col justify-center pt-20">
-            {/* Plasma en rojo de marca. Va sobre negro sólido porque Plasma
-                renderiza con alpha y, sin ese respaldo, se transparenta el
-                gris del fondo de la página en vez de negro puro. La máscara
-                (sobre el negro Y el plasma juntos) suaviza el borde superior
-                e inferior del viewport pineado, para que el enganche/soltado
-                de la sección no se sienta como un corte en seco. */}
-            <div
-              className="absolute inset-0 z-0 pointer-events-none bg-black"
-              style={{
-                maskImage: "linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)",
-                WebkitMaskImage: "linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)"
-              }}
-            >
-              <Plasma
-                color="#f42525"
-                speed={0.5}
-                direction="forward"
-                scale={1.4}
-                opacity={0.55}
-                mouseInteractive={false}
-              />
-            </div>
-            <div className="relative z-10 max-w-container-max mx-auto px-margin-mobile md:px-gutter w-full">
-              <motion.div style={{ opacity: methodHeaderOpacity }} className="text-center mb-6 sm:mb-8 lg:mb-10">
-                <span className="font-label-caps tracking-[0.4em] mb-3 block font-bold">
-                  <ShinyText text="FILOSOFÍA" speed={5} color="#8e9192" shineColor="#ffffff" spread={80} />
-                </span>
-                <h2 className="font-headline-lg text-[26px] sm:text-[32px] md:text-[40px] text-primary font-extrabold uppercase">
-                  Metodología REY
-                </h2>
-              </motion.div>
+        <section
+          ref={methodSectionRef}
+          className="relative bg-surface-container-lowest h-[100svh] w-full overflow-hidden flex flex-col justify-center pt-20"
+        >
+          {/* Plasma en rojo de marca. Va sobre negro sólido porque Plasma
+              renderiza con alpha y, sin ese respaldo, se transparenta el
+              gris del fondo de la página en vez de negro puro. La máscara
+              (sobre el negro Y el plasma juntos) suaviza el borde superior
+              e inferior del viewport, para que no se sienta como un corte
+              en seco contra las secciones vecinas. */}
+          <div
+            className="absolute inset-0 z-0 pointer-events-none bg-black"
+            style={{
+              maskImage: "linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)",
+              WebkitMaskImage: "linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)"
+            }}
+          >
+            <Plasma
+              color="#f42525"
+              speed={0.5}
+              direction="forward"
+              scale={1.4}
+              opacity={0.55}
+              mouseInteractive={false}
+            />
+          </div>
+          <div className="relative z-10 max-w-container-max mx-auto px-margin-mobile md:px-gutter w-full">
+            <motion.div style={{ opacity: methodHeaderOpacity }} className="text-center mb-6 sm:mb-8 lg:mb-10">
+              <span className="font-label-caps tracking-[0.4em] mb-3 block font-bold">
+                <ShinyText text="FILOSOFÍA" speed={5} color="#8e9192" shineColor="#ffffff" spread={80} />
+              </span>
+              <h2 className="font-headline-lg text-[26px] sm:text-[32px] md:text-[40px] text-primary font-extrabold uppercase">
+                Metodología REY
+              </h2>
+            </motion.div>
 
-              <MethodologyPath items={METHOD_ITEMS} progress={activeMethodProgress} />
-            </div>
+            <MethodologyPath items={METHOD_ITEMS} progress={methodPathProgress} />
           </div>
         </section>
       ) : (

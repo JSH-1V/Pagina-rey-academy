@@ -37,7 +37,7 @@ export function PageOpening({ onDone }: { onDone?: () => void }) {
 
   // Bloqueo de scroll real: `overflow:hidden` solo no alcanza en iOS/Safari
   // (no frena el touch-scroll), así que además se intercepta wheel/touch
-  // directamente — mismo patrón ya probado en useScrollLeash.ts. Se libera
+  // directamente — mismo patrón usado en useAutoPlayOnEnter.ts. Se libera
   // en `onExitComplete` de abajo, no con el cleanup normal de este efecto:
   // HomeV2 nunca desmonta este componente, así que un cleanup atado a `[]`
   // nunca se dispararía solo porque `open` pase a false.
@@ -56,9 +56,10 @@ export function PageOpening({ onDone }: { onDone?: () => void }) {
     // Red de seguridad absoluta: pase lo que pase con la secuencia de arriba
     // (`ready`/`open`/`onExitComplete`), el scroll nunca debe quedar
     // bloqueado más que unos segundos. 8s da margen de sobra sobre el peor
-    // caso diseñado (4s de techo duro + ~2s de trazo + ~1s de salida de los
-    // paneles ≈ 7s) sin arriesgar que alguien quede atrapado si algo de la
-    // secuencia normal no dispara. Llamar la limpieza dos veces es inofensivo.
+    // caso diseñado (4s de techo duro + 1.45s de trazo + ~1s de salida de
+    // los paneles ≈ 6.5s) sin arriesgar que alguien quede atrapado si algo
+    // de la secuencia normal no dispara. Llamar la limpieza dos veces es
+    // inofensivo.
     const safety = setTimeout(() => scrollLockCleanupRef.current(), 8000);
     return () => {
       clearTimeout(safety);
@@ -89,11 +90,12 @@ export function PageOpening({ onDone }: { onDone?: () => void }) {
     };
   }, [reduce]);
 
-  // Recién cuando está "listo" arranca el trazo + paneles existentes, con
-  // sus mismos tiempos de siempre.
+  // Recién cuando está "listo" arranca el trazo + paneles. Acortado de
+  // 2100ms a 1450ms (y el trazo de 1.9s a 1.3s más abajo) — la apertura se
+  // sentía larga.
   useEffect(() => {
     if (reduce || !ready) return;
-    const t = setTimeout(() => setOpen(false), 2100);
+    const t = setTimeout(() => setOpen(false), 1450);
     return () => clearTimeout(t);
   }, [reduce, ready]);
 
@@ -183,7 +185,7 @@ export function PageOpening({ onDone }: { onDone?: () => void }) {
                       opacity: [0, 1, 1, 0]
                     }}
                     transition={{
-                      duration: 1.9,
+                      duration: 1.3,
                       times: [0, 0.42, 0.68, 1],
                       ease: [0.76, 0, 0.24, 1]
                     }}
@@ -198,7 +200,7 @@ export function PageOpening({ onDone }: { onDone?: () => void }) {
                   <motion.div
                     initial={{ scaleY: 0, opacity: 0 }}
                     animate={{ scaleY: [0, 0, 1], opacity: [0, 0, 0.5] }}
-                    transition={{ duration: 1.9, times: [0, 0.72, 1], ease: "easeOut" }}
+                    transition={{ duration: 1.3, times: [0, 0.72, 1], ease: "easeOut" }}
                     className="absolute inset-0"
                     style={{
                       background:

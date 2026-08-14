@@ -102,6 +102,17 @@
   --text-headline-lg--font-weight: 700;
 }
 
+/* Reserva permanente del ancho de la barra de scroll. Las secciones que se
+   reproducen con el scroll bloqueado (Metodología, Nuestra Convicción) usan
+   `overflow:hidden`, lo que hace desaparecer la barra: sin esta reserva, toda
+   la página —y sobre todo el nav fijo, que no se puede compensar con padding
+   del body— se corría unos píxeles en horizontal al empezar la animación y
+   volvía al terminarla. Dos saltos laterales justo en los dos momentos que
+   tienen que verse limpios. */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background-color: #131313;
   color: #e2e2e2;

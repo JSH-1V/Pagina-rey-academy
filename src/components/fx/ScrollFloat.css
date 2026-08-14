@@ -13,6 +13,11 @@
   text-align: inherit;
 }
 
+.word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
 .char {
   display: inline-block;
 }

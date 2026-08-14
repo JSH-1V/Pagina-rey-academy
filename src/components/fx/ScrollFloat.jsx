@@ -24,13 +24,31 @@ const ScrollFloat = ({
 }) => {
   const containerRef = useRef(null);
 
+  // Agrupado por palabra (con la clase "word" en white-space: nowrap) y no
+  // por caracter suelto: antes cada letra quedaba como un span suelto sin
+  // ningun lugar legitimo donde el navegador pudiera cortar la linea -
+  // cuando el titulo no entraba en el ancho disponible, terminaba cortando
+  // a mitad de palabra en cualquier letra. Agrupando los caracteres de cada
+  // palabra en un contenedor que no se puede partir, y dejando un espacio
+  // de verdad (cortable) ENTRE palabras, el salto de linea vuelve a caer
+  // solo donde corresponde.
   const splitText = useMemo(() => {
     const text = typeof children === 'string' ? children : '';
-    return text.split('').map((char, index) => (
-      <span className="char" key={index}>
-        {char === ' ' ? '\u00A0' : char}
-      </span>
-    ));
+    const words = text.split(' ');
+    const out = [];
+    words.forEach((word, wordIndex) => {
+      out.push(
+        <span className="word" key={`w-${wordIndex}`}>
+          {word.split('').map((char, charIndex) => (
+            <span className="char" key={charIndex}>
+              {char}
+            </span>
+          ))}
+        </span>
+      );
+      if (wordIndex < words.length - 1) out.push(' ');
+    });
+    return out;
   }, [children]);
 
   useEffect(() => {
