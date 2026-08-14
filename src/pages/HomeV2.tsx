@@ -1542,14 +1542,18 @@ export default function HomeV2({ heroVariant = "fusion" }: { heroVariant?: HeroV
           <p className="font-headline-md text-[20px] sm:text-headline-md text-background/80 mb-12 max-w-3xl mx-auto font-bold uppercase leading-relaxed">
             Únete a la élite de dueños de carnicerías que están redefiniendo el mercado en Latinoamérica.
           </p>
-          <motion.button
+          {/* Antes "RESERVAR ENTREVISTA" sin link, deliberadamente pendiente.
+              Ahora lleva a #programas, igual que el resto de los CTA de la
+              página (ver el botón del hero unas líneas arriba). */}
+          <motion.a
+            href="#programas"
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            className="bg-background text-primary px-8 sm:px-16 py-5 sm:py-8 font-label-caps text-[13px] sm:text-[18px] font-extrabold tracking-[0.15em] sm:tracking-[0.3em] rounded-full w-full sm:w-auto cursor-pointer shadow-2xl hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] transition-shadow duration-300"
+            className="bg-background text-primary px-8 sm:px-16 py-5 sm:py-8 font-label-caps text-[13px] sm:text-[18px] font-extrabold tracking-[0.15em] sm:tracking-[0.3em] rounded-full w-full sm:w-auto cursor-pointer shadow-2xl hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] transition-shadow duration-300 inline-flex items-center justify-center"
           >
-            RESERVAR ENTREVISTA
-          </motion.button>
+            AGENDAR UNA LLAMADA
+          </motion.a>
         </ScrollReveal>
 
         {/* Giant decorative background text — con parallax lento al scrollear:
