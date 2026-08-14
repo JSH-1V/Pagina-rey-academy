@@ -1,0 +1,84 @@
+.mono-bends {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  --mb-blur: 70px;
+  --mb-blur-md: 100px;
+  --mb-opacity: 1;
+}
+
+.mono-bends__blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(var(--mb-blur));
+  will-change: transform;
+}
+
+@media (min-width: 768px) {
+  .mono-bends__blob {
+    filter: blur(var(--mb-blur-md));
+  }
+}
+
+.mono-bends__blob--a {
+  top: -10%;
+  left: -8%;
+  width: 55vw;
+  height: 55vw;
+  background: radial-gradient(circle, rgba(255, 255, 255, calc(0.14 * var(--mb-opacity))), transparent 70%);
+  animation: mono-bends-drift-a 26s ease-in-out infinite;
+}
+
+.mono-bends__blob--b {
+  bottom: -18%;
+  right: -10%;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(255, 255, 255, calc(0.1 * var(--mb-opacity))), transparent 68%);
+  animation: mono-bends-drift-b 32s ease-in-out infinite;
+}
+
+.mono-bends__blob--c {
+  top: 30%;
+  left: 38%;
+  width: 40vw;
+  height: 40vw;
+  background: radial-gradient(circle, rgba(0, 0, 0, calc(0.55 * var(--mb-opacity))), transparent 72%);
+  animation: mono-bends-drift-c 22s ease-in-out infinite;
+}
+
+.mono-bends__blob--d {
+  top: 8%;
+  right: 12%;
+  width: 32vw;
+  height: 32vw;
+  background: radial-gradient(circle, rgba(255, 255, 255, calc(0.08 * var(--mb-opacity))), transparent 70%);
+  animation: mono-bends-drift-d 20s ease-in-out infinite;
+}
+
+@keyframes mono-bends-drift-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(6vw, 8vh) scale(1.12); }
+}
+
+@keyframes mono-bends-drift-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-7vw, -6vh) scale(1.08); }
+}
+
+@keyframes mono-bends-drift-c {
+  0%, 100% { transform: translate(-4vw, 0) scale(1); }
+  50% { transform: translate(5vw, -7vh) scale(0.9); }
+}
+
+@keyframes mono-bends-drift-d {
+  0%, 100% { transform: translate(0, -3vh) scale(1); }
+  50% { transform: translate(-6vw, 6vh) scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mono-bends__blob {
+    animation: none !important;
+  }
+}

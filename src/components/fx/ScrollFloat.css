@@ -1,0 +1,18 @@
+/* ScrollFloat — adaptado a REY ACADEMY: sin tamaño de fuente propio,
+   hereda la escala tipográfica del sitio (headline-lg / display-xl). */
+.scroll-float {
+  overflow: hidden;
+}
+
+.scroll-float-text {
+  display: inline-block;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+}
+
+.char {
+  display: inline-block;
+}
