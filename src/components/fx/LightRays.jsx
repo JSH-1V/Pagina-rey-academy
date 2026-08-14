@@ -97,8 +97,11 @@ const LightRays = ({
 
       if (!containerRef.current) return;
 
+      // Gama baja en mobile no aguanta DPR 2 en un shader por-pixel — un
+      // pelo de aliasing extra vale la pena a cambio de no trabarse.
+      const isMobile = window.innerWidth < 768;
       const renderer = new Renderer({
-        dpr: Math.min(window.devicePixelRatio, 2),
+        dpr: Math.min(window.devicePixelRatio, isMobile ? 1 : 2),
         alpha: true
       });
       rendererRef.current = renderer;
@@ -247,7 +250,7 @@ void main() {
       const updatePlacement = () => {
         if (!containerRef.current || !renderer) return;
 
-        renderer.dpr = Math.min(window.devicePixelRatio, 2);
+        renderer.dpr = Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1 : 2);
 
         const { clientWidth: wCSS, clientHeight: hCSS } = containerRef.current;
         renderer.setSize(wCSS, hCSS);

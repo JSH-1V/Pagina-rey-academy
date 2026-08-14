@@ -182,12 +182,15 @@ const Topography = ({
     const container = containerRef.current;
     if (!container) return;
 
+    // Gama baja en mobile no aguanta DPR 2 en un shader por-pixel — un pelo
+    // de aliasing extra vale la pena a cambio de no trabarse.
+    const isMobile = window.innerWidth < 768;
     const renderer = new Renderer({
       webgl: 2,
       alpha: true,
       premultipliedAlpha: true,
       antialias: false,
-      dpr: Math.min(window.devicePixelRatio || 1, 2)
+      dpr: Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 2)
     });
 
     const gl = renderer.gl;

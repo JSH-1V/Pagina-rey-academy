@@ -15,6 +15,7 @@ import {
 import { DitherField } from "./fx/DitherField";
 import ShinyText from "./fx/ShinyText";
 import { useScrollLeash } from "./useScrollLeash";
+import { useReleaseFracProgress } from "./useReleaseFracProgress";
 
 const DITHER_COLORS: [string, string, string, string] = ["#0d0d0d", "#3a0d0d", "#f42525", "#ffffff"];
 
@@ -113,21 +114,24 @@ function ScrubLine({
 
   return (
     <span className={`block ${className}`}>
-      {words.map((word, i) => (
-        <span key={`${word}-${i}`}>
-          {/* start/end ya no necesitan clampearse a mano: ScrubWord calcula su
-              progreso local con su propio Math.min/max, así que un `end` por
-              encima de 1 (por el solape) no rompe nada. */}
-          <ScrubWord
-            word={word}
-            progress={progress}
-            start={from + i * step}
-            end={from + i * step + windowSize}
-            color={color}
-          />
-          {i < words.length - 1 && " "}
-        </span>
-      ))}
+      {words.map((word, i) => {
+        const start = from + i * step;
+        // El solape (windowSize > step) hace que el `end` de la ÚLTIMA
+        // palabra caiga bastante después de `to` — con pocas palabras y un
+        // `to` cercano a 1 (como "Construimos imperios rentables."), ese
+        // `end` terminaba pasando el propio 1.0 del progreso. Como el
+        // progreso nunca llega más allá de 1, esa palabra nunca alcanzaba
+        // local=1: se quedaba con blur y opacidad residual para siempre, por
+        // más que siguieras scrolleando. Clampear el `end` de la última
+        // palabra a `to` garantiza que SIEMPRE termine de enfocarse.
+        const end = i === words.length - 1 ? to : start + windowSize;
+        return (
+          <span key={`${word}-${i}`}>
+            <ScrubWord word={word} progress={progress} start={start} end={end} color={color} />
+            {i < words.length - 1 && " "}
+          </span>
+        );
+      })}
     </span>
   );
 }
@@ -158,7 +162,11 @@ export function StatementScrub({
   framePath = "/scrub/frame_",
   frameExt = "webp",
   frameCount = 62,
-  heightClassName = "h-[200vh] sm:h-[240vh] lg:h-[300vh]"
+  // Mobile achicado a la mitad del recorrido real (200vh - 100svh de sticky
+  // = 100vh de scroll antes; 150vh - 100svh = 50vh ahora): en pantallas
+  // chicas hacía falta demasiado scroll para terminar de revelar el texto y
+  // el frame-scrub de fondo. sm:/lg: quedan igual — el pedido era solo mobile.
+  heightClassName = "h-[150vh] sm:h-[240vh] lg:h-[300vh]"
 }: StatementScrubProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const progressRef = useRef(0);
@@ -183,40 +191,10 @@ export function StatementScrub({
     offset: ["start start", "end end"]
   });
 
-  // `scrollYProgress` llega a 1 recién cuando el WRAPPER exterior (200–300vh)
-  // termina de pasar — pero el bloque `sticky` (100svh) se desengancha bastante
-  // antes de eso, en cuanto falta exactamente su propia altura para llegar al
-  // final del wrapper (es como funciona `position: sticky`, no hay forma de
-  // evitarlo). En desktop (wrapper 300vh) eso pasa ~67% del recorrido: todo lo
-  // programado para revelarse después de ese punto lo hacía con el bloque ya
-  // deslizándose fuera de la pantalla — se leía como que el texto
-  // "desaparecía" a media animación. `activeProgress` reescala 0→releaseFrac a
-  // 0→1, así que tanto el texto como el frame del fondo terminan de armarse
-  // ANTES de que el pin se suelte, nunca durante.
-  const releaseFracRef = useRef(1);
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const measure = () => {
-      const sectionH = el.offsetHeight;
-      const viewportH = window.innerHeight;
-      if (sectionH > 0) {
-        releaseFracRef.current = Math.max(0.05, Math.min(1, 1 - viewportH / sectionH));
-      }
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    window.addEventListener("resize", measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, []);
-
-  const activeProgress = useTransform(scrollYProgress, (v) =>
-    Math.min(1, v / releaseFracRef.current)
-  );
+  // Reescala 0→releaseFrac a 0→1 para que tanto el texto como el frame del
+  // fondo terminen de armarse ANTES de que el pin (`sticky`) se suelte, nunca
+  // durante — ver el comentario en useReleaseFracProgress.ts para el porqué.
+  const activeProgress = useReleaseFracProgress(sectionRef, scrollYProgress);
 
   useMotionValueEvent(activeProgress, "change", (v) => {
     progressRef.current = v;
@@ -331,7 +309,13 @@ export function StatementScrub({
           style={{ opacity: contentOpacity }}
           className="relative z-10 w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter text-center"
         >
-          <span className="font-label-caps tracking-[0.4em] font-bold block mb-8 sm:mb-12">
+          {/* Mismo drop-shadow que el eyebrow del hero: sin esto, contra un
+              frame claro del dither el gris se lava igual que le pasaba al
+              texto del hero antes de aplicárselo ahí. */}
+          <span
+            className="font-label-caps tracking-[0.4em] font-bold block mb-8 sm:mb-12"
+            style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.95)) drop-shadow(0 4px 12px rgba(0,0,0,0.8))" }}
+          >
             <ShinyText text={eyebrow} speed={5} color="#8e9192" shineColor="#ffffff" spread={80} />
           </span>
 

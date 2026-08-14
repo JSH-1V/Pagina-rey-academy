@@ -120,13 +120,21 @@ export const Plasma = ({
 
     const directionMultiplier = direction === 'reverse' ? -1.0 : 1.0;
 
+    // Gama baja en mobile no aguanta la calidad completa de este shader (60
+    // iteraciones de raymarching por pixel) — un piso más agresivo que lo
+    // que venga por props, sin cambiar nada en desktop.
+    const isMobile = window.innerWidth < 768;
+    const effectiveRenderScale = isMobile ? Math.min(renderScale, 0.35) : renderScale;
+    const effectiveIterations = isMobile ? Math.min(iterations, 28) : iterations;
+    const effectiveMaxDpr = isMobile ? 1 : maxDpr;
+
     let renderer;
     try {
       renderer = new Renderer({
         webgl: 2,
         alpha: true,
         antialias: false,
-        dpr: Math.min(window.devicePixelRatio || 1, maxDpr)
+        dpr: Math.min(window.devicePixelRatio || 1, effectiveMaxDpr)
       });
     } catch {
       return;
@@ -144,7 +152,7 @@ export const Plasma = ({
 
     const program = new Program(gl, {
       vertex: vertex,
-      fragment: buildFragment(iterations),
+      fragment: buildFragment(effectiveIterations),
       uniforms: {
         iTime: { value: 0 },
         iResolution: { value: new Float32Array([1, 1]) },
@@ -156,8 +164,8 @@ export const Plasma = ({
         uOpacity: { value: opacity },
         uMouse: { value: new Float32Array([0, 0]) },
         uMouseInteractive: { value: mouseInteractive ? 1.0 : 0.0 },
-        uQuality: { value: iterations },
-        uStepScale: { value: ORIGINAL_QUALITY / iterations },
+        uQuality: { value: effectiveIterations },
+        uStepScale: { value: ORIGINAL_QUALITY / effectiveIterations },
       }
     });
 
@@ -180,8 +188,8 @@ export const Plasma = ({
     let resizePending = false;
     const setSize = () => {
       const rect = containerEl.getBoundingClientRect();
-      const width = Math.max(1, Math.floor(rect.width * renderScale));
-      const height = Math.max(1, Math.floor(rect.height * renderScale));
+      const width = Math.max(1, Math.floor(rect.width * effectiveRenderScale));
+      const height = Math.max(1, Math.floor(rect.height * effectiveRenderScale));
       renderer.setSize(width, height);
 
       // renderer.setSize also sets canvas.style.width/height to match the (scaled-down) drawing buffer - override that so the canvas still stretches to fill its container via CSS while the buffer stays small.

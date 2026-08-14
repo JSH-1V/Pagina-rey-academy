@@ -225,7 +225,11 @@ export function DitherField({
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-    const renderer = new Renderer({ dpr: Math.min(window.devicePixelRatio, 2), alpha: false });
+    // Gama baja en mobile no aguanta DPR 2 en un shader por-pixel corriendo
+    // todo el scroll — un pelo de aliasing extra vale la pena a cambio de no
+    // trabarse.
+    const isMobile = window.innerWidth < 768;
+    const renderer = new Renderer({ dpr: Math.min(window.devicePixelRatio, isMobile ? 1 : 2), alpha: false });
     const gl = renderer.gl;
     gl.canvas.style.width = "100%";
     gl.canvas.style.height = "100%";

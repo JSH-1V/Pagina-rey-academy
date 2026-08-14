@@ -45,7 +45,8 @@ import Topography from "../components/fx/Topography";
 import LightRays from "../components/fx/LightRays";
 import Plasma from "../components/fx/Plasma";
 import { MethodologyPath } from "../components/MethodologyPath";
-import { useScrollLeash } from "../components/useScrollLeash";
+import { useScrollStepper } from "../components/useScrollStepper";
+import { useReleaseFracProgress } from "../components/useReleaseFracProgress";
 import SplitText from "../components/fx/SplitText";
 import AnimatedContent from "../components/fx/AnimatedContent";
 
@@ -144,13 +145,23 @@ export default function HomeV2({ heroVariant = "fusion" }: { heroVariant?: HeroV
     target: methodSectionRef,
     offset: ["start start", "end end"]
   });
-  // Scroll con física de carril: un empujón hacia abajo y la inercia sigue
-  // moviendo la página sola (con fricción) hasta frenar, en vez de responder
-  // 1:1 al gesto o de bloquear en seco. Como el scroll real ya queda
-  // gobernado por esta física, `methodProgress` (que lo sigue) hereda el
-  // mismo ritmo — no hace falta un segundo valor "suavizado" aparte.
-  useScrollLeash(methodSectionRef);
-  const methodHeaderOpacity = useTransform(methodProgress, [0, 0.05], [0, 1]);
+  // El modelo de física continua (velocidad + fricción, como en
+  // StatementScrub) resultó imposible de calibrar a control remoto acá: 450
+  // no se notaba, 220 se sintió muy lento, 330 volvió a sentirse rápido —
+  // rebotando sin punto medio estable. Con pasos fijos, un primer intento de
+  // 8 pasos grandes (~190px c/u) se sintió como saltos, no como scroll — acá
+  // con pasos chicos (55px) y rápidos (190ms) para que se lean como
+  // desplazamiento fluido en vez de saltos entre tarjetas.
+  useScrollStepper(methodSectionRef, { stepPx: 55, stepDuration: 190 });
+  // Igual que StatementScrub: `methodProgress` crudo llega a 1 recién cuando
+  // el wrapper entero termina de pasar, pero el `sticky` se desengancha
+  // bastante antes (en mobile, a los 280vh de antes, ~64% del recorrido) —
+  // sin reescalar, las últimas tarjetas podían seguir revelándose con la
+  // sección ya deslizándose fuera de pantalla. `activeMethodProgress`
+  // garantiza que la línea + las 6 tarjetas siempre terminan de revelarse
+  // ANTES de que el pin se suelte, sea cual sea la altura de la sección.
+  const activeMethodProgress = useReleaseFracProgress(methodSectionRef, methodProgress);
+  const methodHeaderOpacity = useTransform(activeMethodProgress, [0, 0.05], [0, 1]);
 
   // Monitor scroll for header background opacity
   useEffect(() => {
@@ -343,13 +354,17 @@ export default function HomeV2({ heroVariant = "fusion" }: { heroVariant?: HeroV
         id="navbar"
       >
         <div className="flex justify-between items-center w-full px-margin-mobile md:px-gutter max-w-container-max mx-auto">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="font-headline-md text-[18px] sm:text-[22px] font-extrabold text-primary flex items-center gap-3 whitespace-nowrap flex-shrink-0"
+            className="flex items-center flex-shrink-0"
           >
-            REY ACADEMY
+            <img
+              src="https://assets.cdn.filesafe.space/WDYpjQTiKpK6eUD1aFYZ/media/6a79f1b022e1e17a2b149e9b.png"
+              alt="Rey Academy"
+              className="h-12 sm:h-16 w-auto flex-shrink-0"
+            />
           </motion.div>
 
           {/* Desktop Navigation Links */}
@@ -1239,8 +1254,12 @@ export default function HomeV2({ heroVariant = "fusion" }: { heroVariant?: HeroV
           grilla. En /v2/dither la sección se PINEA (scroll-jack, como el hero
           parallax o la declaración de marca): la pantalla queda fija mientras
           la línea roja recorre las 6 tarjetas, y recién se suelta al terminar. */}
+      {/* Mobile achicado a la mitad del recorrido real (280vh - 100svh de
+          sticky = 180vh de scroll antes; 190vh - 100svh = 90vh ahora) — hacía
+          falta demasiado scroll para revelar las 6 tarjetas en pantallas
+          chicas. sm:/lg: sin cambios. */}
       {isDither ? (
-        <section ref={methodSectionRef} className="relative bg-surface-container-lowest h-[280vh] sm:h-[300vh] lg:h-[320vh]">
+        <section ref={methodSectionRef} className="relative bg-surface-container-lowest h-[190vh] sm:h-[300vh] lg:h-[320vh]">
           <div className="sticky top-0 h-[100svh] w-full overflow-hidden flex flex-col justify-center pt-20">
             {/* Plasma en rojo de marca. Va sobre negro sólido porque Plasma
                 renderiza con alpha y, sin ese respaldo, se transparenta el
@@ -1274,7 +1293,7 @@ export default function HomeV2({ heroVariant = "fusion" }: { heroVariant?: HeroV
                 </h2>
               </motion.div>
 
-              <MethodologyPath items={METHOD_ITEMS} progress={methodProgress} />
+              <MethodologyPath items={METHOD_ITEMS} progress={activeMethodProgress} />
             </div>
           </div>
         </section>
