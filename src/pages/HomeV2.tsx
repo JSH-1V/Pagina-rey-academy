@@ -1623,6 +1623,7 @@ export default function HomeV2({ heroVariant = "fusion" }: { heroVariant?: HeroV
               </h4>
               <ul className="space-y-4 text-base text-on-surface-variant font-medium">
                 <li className="flex items-center gap-3"><span className="material-symbols-outlined text-primary text-base">mail</span> info@mg.reyacademy.com</li>
+                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-primary text-base">call</span> +1 855-783-3002</li>
                 <li className="flex items-center gap-3"><span className="material-symbols-outlined text-primary text-base">location_on</span> Global Operations</li>
               </ul>
             </motion.div>
